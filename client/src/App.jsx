@@ -21,7 +21,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           /* Used for subpage which includes subpages follwed by account */
-          <Route path="/account/:subpage?" element={<AccountPage />} />
+          <Route path="/account/:subpage/:action?" element={<AccountPage />} />
    
         </Route>
       </Routes>
