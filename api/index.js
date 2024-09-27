@@ -104,6 +104,7 @@ app.post('/logout', (req, res) => {
 })
 
 
+// upload img by a link
 app.post('/upload-by-link', async (req, res) => {
     const {link} = req.body;
     const newName = 'photo' + Date.now() + '.jpg';
@@ -112,22 +113,36 @@ app.post('/upload-by-link', async (req, res) => {
         // __dirname -> is the full file path
         dest: __dirname + '/uploads/' + newName
     });
+    console.log('whatttttttttttttt')
+    console.log(req.body)
 
     res.json(newName);
 
 })
 
+// middleware to handle uploaded photos
 const photosMiddleware = multer({dest:'uploads'});
-
-app.post('/upload',photosMiddleware.array('photos', 100), (req, res) => {
+ 
+app.post('/upload', photosMiddleware.array('photos', 100), (req, res) => {
+    const uploadFiles = [];
+    console.log(req.files.length)
     for (let i = 0; i < req.files.length; i++) {
-            const {path, originalname} = req.files[i];
-            const parts = originalname.split('.')
-            const ext = parts[parts.length - 1];
-            const newPath = path + '.' + ext;
-            fs.renameSync(path, newPath);
-            uploadFiles.push(newPath.replace('uploads/', ''))
+        console.log(req.files[i])
+        const { path, originalname } = req.files[i];
+        const parts = originalname.split('.');
+        const ext = parts[parts.length - 1]; // Get the extension of the original file
+        const newPath = path + '.' + ext; // Create new path with the original extension
+        
+        // Rename the uploaded file to include the original name and extension
+        fs.renameSync(path, newPath);
+
+        // Push the new path (relative to uploads) to the uploadFiles array
+        uploadFiles.push(newPath.replace('uploads/', ''));
     }
-    res.json(req.files);  
-})
+    console.log(uploadFiles)
+    
+    // Respond with the array of uploaded file paths
+    res.json(uploadFiles);
+});
+
 app.listen(4000, () => console.log('Server running on http://localhost:4000'));

@@ -60,8 +60,9 @@ export default function PlacesPage() {
             headers: {"Content-type":"multipart/form-data"}
         }).then(response => {
             const {data:filenames} = response;
+          
             setAddedPhotos(prev => {
-                return [...prev, ...filenames]
+                return [...prev, filenames]
             })
         })
     }
@@ -71,8 +72,8 @@ export default function PlacesPage() {
             {action !== "new" && (
                 <div className="text-center">
                 <Link className="inline-flex gap-1 bg-primary text-white py-2 px-6 rounded-full" to={'/account/places/new'}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
-                         <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" class="size-6">
+                         <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
                     </svg>
                     Add new Places
                 </Link>
@@ -103,16 +104,18 @@ export default function PlacesPage() {
                         </div>
 
 
-                        <div className="mt-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
+                        <div className="mt-2 gap-2 grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6">
                             {addedPhotos.length > 0 && addedPhotos.map(link => (
+                            
                                 <div className="h-32 flex ">
+                                    {console.log(addedPhotos)}
                                     <img className ="rounded-2xl w-full object-cover" src={'http://localhost:4000/uploads/'+link } alt ="" />
 
                                 </div>
                              )) }
 
                             <label className="h-32 cursor-pointer inline-flex items-center gap-1 justify-center  border bg-transparent rounded-2xl p-2 text-2xl text-gray-600">
-                                <input type="file" className="hidden" onChange={uploadPhoto}/>
+                                <input type="file" multiple className="hidden" onChange={uploadPhoto}/>
                                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-8">
                                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 16.5V9.75m0 0 3 3m-3-3-3 3M6.75 19.5a4.5 4.5 0 0 1-1.41-8.775 5.25 5.25 0 0 1 10.233-2.33 3 3 0 0 1 3.758 3.848A3.752 3.752 0 0 1 18 19.5H6.75Z" />
                                 </svg>
