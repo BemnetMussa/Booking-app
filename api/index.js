@@ -125,9 +125,8 @@ const photosMiddleware = multer({dest:'uploads'});
  
 app.post('/upload', photosMiddleware.array('photos', 100), (req, res) => {
     const uploadFiles = [];
-    console.log(req.files.length)
     for (let i = 0; i < req.files.length; i++) {
-        console.log(req.files[i])
+    
         const { path, originalname } = req.files[i];
         const parts = originalname.split('.');
         const ext = parts[parts.length - 1]; // Get the extension of the original file
@@ -139,34 +138,32 @@ app.post('/upload', photosMiddleware.array('photos', 100), (req, res) => {
         // Push the new path (relative to uploads) to the uploadFiles array
         uploadFiles.push(newPath.replace('uploads/', ''));
     }
-
-    
-    // Respond with the array of uploaded file paths
     res.json(uploadFiles);
 });
 
 
-
-app.post('/place', async (req, res) => {
+app.post('/places', async (req, res) => {
     const { title, address, addedPhotos,
             description, perks, extraInfo,
             checkIn, checkOut, maxGuests} = req.body;
 
-    const {token} = req.cookies;
-    
+    const {token} = req.cookies;   
     if (token) {
         jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+
             if (err) throw err;
+            const addedPhoto = addedPhotos.flat()
+   
             const placesDoc = await Place.create({
                 owner: userData.id,
-                title, address, photos:addedPhotos,
+                title, address, photos:addedPhoto,
                 description, perks, extraInfo,
                 checkIn, checkOut, maxGuests
             }) 
+         
             res.json(placesDoc)
     })}
 });
-
 
 app.get('/places', (req, res) => {
     const {token} = req.cookies;
@@ -187,19 +184,27 @@ app.put('/places', async (req, res) => {
     const { id, title, address, addedPhotos,
         description, perks, extraInfo,
         checkIn, checkOut, maxGuests} = req.body;
+    
+    const addedPhoto = addedPhotos.flat();
 
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if (err) throw err;
         const placeDoc = await Place.findById(id);
+      
         if (userData.id === placeDoc.owner.toString()) {
             placeDoc.set({
-                title, address, photos:addedPhotos, description,
+                title, address, photos:addedPhoto, description,
                 perks, extraInfo, checkIn, checkOut, maxGuests
             })
+
+            
             await placeDoc.save();
+
             res.json('succeeded')
         }
+
     })
     
 })
 app.listen(4000, () => console.log('Server running on http://localhost:4000'));
+
