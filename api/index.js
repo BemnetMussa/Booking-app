@@ -8,6 +8,7 @@ const imageDownloader = require('image-downloader');
 const multer = require('multer')
 const fs = require('fs');
 const Place = require('./models/places')
+const Booking = require('./models/Booking')
 
 
 require('dotenv').config();
@@ -145,7 +146,7 @@ app.post('/upload', photosMiddleware.array('photos', 100), (req, res) => {
 app.post('/places', async (req, res) => {
     const { title, address, addedPhotos,
             description, perks, extraInfo,
-            checkIn, checkOut, maxGuests} = req.body;
+            checkIn, checkOut, maxGuests, price} = req.body;
 
     const {token} = req.cookies;   
     if (token) {
@@ -158,14 +159,14 @@ app.post('/places', async (req, res) => {
                 owner: userData.id,
                 title, address, photos:addedPhoto,
                 description, perks, extraInfo,
-                checkIn, checkOut, maxGuests
+                checkIn, checkOut, maxGuests, price
             }) 
          
             res.json(placesDoc)
     })}
 });
 
-app.get('/places', (req, res) => {
+app.get('/user-places', (req, res) => {
     const {token} = req.cookies;
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
         if (err) throw err;
@@ -183,8 +184,7 @@ app.put('/places', async (req, res) => {
     const {token} = req.cookies;
     const { id, title, address, addedPhotos,
         description, perks, extraInfo,
-        checkIn, checkOut, maxGuests} = req.body;
-    
+        checkIn, checkOut, maxGuests, price} = req.body;
     const addedPhoto = addedPhotos.flat();
 
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
@@ -194,7 +194,7 @@ app.put('/places', async (req, res) => {
         if (userData.id === placeDoc.owner.toString()) {
             placeDoc.set({
                 title, address, photos:addedPhoto, description,
-                perks, extraInfo, checkIn, checkOut, maxGuests
+                perks, extraInfo, checkIn, checkOut, maxGuests, price
             })
 
             
@@ -206,5 +206,29 @@ app.put('/places', async (req, res) => {
     })
     
 })
+
+
+app.get('/places', async (req,res) => {
+    res.json(await Place.find())
+})
+
+
+app.post('/booking', (req,res) => {
+    const {place, checkIn, checkOut,
+           numberOfNights, name, phone, price} = req.body;
+    
+    Booking.create({
+        place, checkIn, checkOut,
+        numberOfNights, name, phone, price
+    }).then((doc) => {
+      
+        res.json(doc);
+    }).catch((err) => {
+        throw err;
+    });
+    
+
+})
 app.listen(4000, () => console.log('Server running on http://localhost:4000'));
+
 
