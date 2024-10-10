@@ -10,7 +10,6 @@ const fs = require('fs');
 const Place = require('./models/places')
 const Booking = require('./models/Booking')
 
-
 require('dotenv').config();
 
 const app = express();
@@ -37,6 +36,21 @@ const userSchema = new mongoose.Schema({
 
 //  creating a collection model called clients with the userSchema structure 
 const User = mongoose.model('User', userSchema, 'clients');
+
+
+
+
+
+function getUserDataFromReq(req) {
+    // helps us to return the userData to the function
+    return new Promise((resolve, reject) => {
+        jwt.verify(req.cookies.token, jwtSecret, {}, async (err, userDoc) => {
+            if (err) throw err;
+            resolve(userDoc);
+        })
+    })
+}
+
 
 app.get('/test', (req, res) => {
     res.json('test.');
@@ -213,13 +227,15 @@ app.get('/places', async (req,res) => {
 })
 
 
-app.post('/booking', (req,res) => {
+app.post('/booking', async (req,res) => {
+    const userData = await getUserDataFromReq(req);
+
     const {place, checkIn, checkOut,
            numberOfNights, name, phone, price} = req.body;
     
     Booking.create({
         place, checkIn, checkOut,
-        numberOfNights, name, phone, price
+        numberOfNights, name, phone, price, user:userData.id
     }).then((doc) => {
       
         res.json(doc);
@@ -228,6 +244,12 @@ app.post('/booking', (req,res) => {
     });
     
 
+})
+
+
+app.get('/bookings', async (req,res) => {
+    const userData = await getUserDataFromReq(req);
+    res.json(await Booking.find({user:userData.id}))
 })
 app.listen(4000, () => console.log('Server running on http://localhost:4000'));
 

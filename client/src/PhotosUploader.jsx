@@ -21,8 +21,7 @@ export default function PhotosUploader({addedPhotos, onChange}) {
     async function uploadPhoto(e) {
         const files = e.target.files;
         const data = new FormData();
-        console.log("aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")
-        console.log(files)
+   
         for (let i = 0; i < files.length; i++) {
             data.append('photos', files[i]);
         }
