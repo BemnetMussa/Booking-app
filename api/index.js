@@ -249,7 +249,7 @@ app.post('/booking', async (req,res) => {
 
 app.get('/bookings', async (req,res) => {
     const userData = await getUserDataFromReq(req);
-    res.json(await Booking.find({user:userData.id}))
+    res.json(await Booking.find({user:userData.id}).populate('place'))
 })
 app.listen(4000, () => console.log('Server running on http://localhost:4000'));
 
